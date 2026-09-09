@@ -1,10 +1,10 @@
 FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      python3 \
-      python3-pip \
-      python3-dev \
-      build-essential \
+      python3=3.10.6-1~22.04.1 \
+      python3-pip=22.0.2+dfsg-1ubuntu0.7 \
+      python3-dev=3.10.6-1~22.04.1 \
+      build-essential=12.9ubuntu3 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app

@@ -45,6 +45,8 @@ A pipeline should catch bad practices in your Dockerfile before it even builds, 
   docker run --rm -i hadolint/hadolint < Dockerfile
   ```
 
+  > :bulb: The Dockerfile pins exact `apt` package versions (e.g. `python3=3.10.6-1~22.04.1`), which is why this passes cleanly - hadolint's `DL3008` rule otherwise flags unpinned packages as non-reproducible. The trade-off: pinned versions eventually age out of Ubuntu's mirrors, so you'll need to bump them occasionally (a tool like Renovate/Dependabot can do this automatically).
+
 - Introduce an obvious bad practice, e.g. add `RUN apt-get update` on its own line without `apt-get install` in the same layer, and re-run hadolint - you should see it flag `DL3009` / `DL3015`-style warnings.
 
 > :bulb: In a real pipeline, this step should **fail the build** (non-zero exit code) if issues are found, so bad Dockerfiles never even reach the build step.
