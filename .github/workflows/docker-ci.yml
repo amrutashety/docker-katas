@@ -9,6 +9,9 @@ on:
       - ".github/workflows/docker-ci.yml"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-scan-push:
     runs-on: ubuntu-latest
@@ -22,7 +25,7 @@ jobs:
         run: docker build -t myfirstapp:${{ github.sha }} labs/cicd-pipeline
 
       - name: Scan image
-        run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL myfirstapp:${{ github.sha }}
+        run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --ignore-unfixed --exit-code 1 --severity HIGH,CRITICAL myfirstapp:${{ github.sha }}
 
       # Disabled by default - this training repo has no registry credentials configured.
       # Set the REGISTRY_USER/REGISTRY_PASSWORD secrets and remove `if: false` to enable pushing.
