@@ -9,6 +9,9 @@ on:
       - ".github/workflows/docker-ci.yml"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-scan-push:
     runs-on: ubuntu-latest
