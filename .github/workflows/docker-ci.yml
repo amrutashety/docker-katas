@@ -1,0 +1,35 @@
+name: docker-ci
+
+on:
+  push:
+    branches:
+      - advanced-docker
+    paths:
+      - "labs/cicd-pipeline/**"
+      - ".github/workflows/docker-ci.yml"
+  workflow_dispatch:
+
+jobs:
+  build-scan-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint Dockerfile
+        run: docker run --rm -i hadolint/hadolint < labs/cicd-pipeline/Dockerfile
+
+      - name: Build image
+        run: docker build -t myfirstapp:${{ github.sha }} labs/cicd-pipeline
+
+      - name: Scan image
+        run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --exit-code 1 --severity HIGH,CRITICAL myfirstapp:${{ github.sha }}
+
+      # Disabled by default - this training repo has no registry credentials configured.
+      # Set the REGISTRY_USER/REGISTRY_PASSWORD secrets and remove `if: false` to enable pushing.
+      - name: Log in to registry
+        if: false && github.ref == 'refs/heads/advanced-docker'
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+
+      - name: Push image
+        if: false && github.ref == 'refs/heads/advanced-docker'
+        run: docker push myfirstapp:${{ github.sha }}

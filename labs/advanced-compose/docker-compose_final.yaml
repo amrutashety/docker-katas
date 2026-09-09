@@ -1,0 +1,34 @@
+services:
+  wordpress-container:
+    image: wordpress:5.7.2-apache
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_HOST: mysql-container
+      WORDPRESS_DB_NAME: wordpressdb
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+    depends_on:
+      mysql-container:
+        condition: service_healthy
+
+  mysql-container:
+    image: mysql:5.7.36
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wordpressdb
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+secrets:
+  db_password:
+    file: ./db_password.txt

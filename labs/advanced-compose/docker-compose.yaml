@@ -1,0 +1,19 @@
+services:
+  #  wordpress-container:
+
+  mysql-container:
+    image: mysql:5.7.36
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wordpressdb
+    secrets:
+      - db_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+secrets:
+  db_password:
+    file: ./db_password.txt
